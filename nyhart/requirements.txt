@@ -1,0 +1,9 @@
+connectorx>=0.4.3
+fastexcel>=0.14.0
+fmc_py_datatools @ git+https://github.com/KM1604/fmc_py_datatools
+pandas
+polars>=1.31.0
+pyarrow>=21.0.0
+pyodbc>=5.2.0
+pywin32>=311
+sqlalchemy

@@ -1,0 +1,5 @@
+# MS temp files when a file is in use
+\~*
+*.toml
+*.xlsx
+source/
