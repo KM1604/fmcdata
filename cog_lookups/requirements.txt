@@ -1,0 +1,12 @@
+certifi==2025.8.3
+charset-normalizer==3.4.3
+connectorx==0.4.4
+fastexcel==0.15.1
+fmc_py_datatools @ git+https://github.com/KM1604/fmc_py_datatools
+idna==3.10
+polars==1.33.1
+pyarrow==21.0.0
+pyodbc==5.2.0
+pywin32>=310
+requests==2.32.5
+urllib3==2.5.0
