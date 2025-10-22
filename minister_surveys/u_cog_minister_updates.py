@@ -82,7 +82,7 @@ def format_conference(df):
     return result
 
 
-def format_surveys(df):
+def format_surveys(df, col_rename, col_select):
     result = df
     result = add_race_cols(result)
     result = add_eth_cols(result)
@@ -90,52 +90,8 @@ def format_surveys(df):
     result = add_consent_cols(result)
     result = fix_dates(result)
     result = format_conference(result)
-    result = result.rename(
-        {
-            "Id": "id",
-            "LanguagePref": "language_pref",
-            "Ministerid": "minister_id",
-            "NameFirst": "name_first",
-            "NameMiddle": "name_middle",
-            "NameLast": "name_last",
-            "NameSuffix": "name_suffix",
-            "NameYearbook": "name_yearbook",
-            "OrdinationStatus": "ordination_status",
-            "Phone": "phone",
-            "Email": "email",
-        }
-    )
-    result = result.select(
-        [
-            "id",
-            "submission_date",
-            "language_pref",
-            "minister_id",
-            "conference_id",
-            "conference_name",
-            "name_first",
-            "name_middle",
-            "name_last",
-            "name_suffix",
-            "name_yearbook",
-            "ordination_status",
-            "phone",
-            "phone_consent",
-            "email",
-            "email_consent",
-            "date_birth",
-            "race_native",
-            "race_asian",
-            "race_black",
-            "race_pacific",
-            "race_white",
-            "race_other",
-            "race_decline",
-            "gender",
-            "eth_hispanic",
-            "eth_arab",
-        ]
-    )
+    result = result.rename(col_rename)
+    result = result.select(col_select)
     return result
 
 
@@ -145,7 +101,11 @@ def main():
     api_key = cfg["cognito"]["api_key"]
     form_id = cfg["cogministersurveys"]["form_id"]
     surveys = fmccog.get_form_ret_df(api_key, form_id)
-    surveys = format_surveys(surveys)
+    surveys = format_surveys(
+        surveys,
+        cfg["cogministersurveys"]["col_rename"],
+        cfg["cogministersurveys"]["col_select"],
+    )
     print(surveys)
     fmccsv.writecsv_from_frame(surveys, "cog_minister_surveys.csv")
     print("local csv written...")
