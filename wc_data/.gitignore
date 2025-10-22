@@ -1,0 +1,4 @@
+# MS temp files when a file is in use
+\~*
+*.toml
+*.csv
