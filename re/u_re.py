@@ -28,7 +28,7 @@ def re_table_update(cfg_value, sql):
         if_table_exists="replace"
         )
     fmcsql.execute_sql(sql.pyodbc_conn, cfg_value["u_script"])
-    fmcsql.execute_sql(sql.pyodbc_conn, f'''DELETE FROM {cfg_value["s_table"]}''')
+    fmcsql.execute_sql(sql.pyodbc_conn, f'''DROP TABLE {cfg_value["s_table"]}''')
 
 def main():
     cfg = fmccfg.read_toml("re_cfg.toml")
