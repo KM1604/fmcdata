@@ -35,6 +35,7 @@ def main():
     FMCSQL = fmcsql.SQLServer(cfg["sql"])
 
     re_table_update(cfg["km0017"], FMCSQL)
+    '''
     re_table_update(cfg["km0020"], FMCSQL)
     re_table_update(cfg["km0021"], FMCSQL)
     re_table_update(cfg["km0022"], FMCSQL)
@@ -44,6 +45,7 @@ def main():
     re_table_update(cfg["km0026"], FMCSQL)
     re_table_update(cfg["km0027"], FMCSQL)
     re_table_update(cfg["km0028"], FMCSQL)
+    '''
 
 if __name__ == "__main__":
     main()
