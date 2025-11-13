@@ -32,7 +32,7 @@ def ny_index():
     )
     fmcsql.execute_sql(FMCSQL.pyodbc_conn, "EXEC u_ny_pension_index")
     fmcsql.execute_sql(
-        FMCSQL.pyodbc_conn, f"""DELETE FROM {cfg["ny_index"]["temp_table"]}"""
+        FMCSQL.pyodbc_conn, f"""DROP TABLE {cfg["ny_index"]["temp_table"]}"""
     )
 
 
@@ -64,7 +64,7 @@ def ny_salary():
     )
     fmcsql.execute_sql(FMCSQL.pyodbc_conn, "EXEC u_ny_salary_history")
     fmcsql.execute_sql(
-        FMCSQL.pyodbc_conn, f"""DELETE FROM {cfg["ny_salary"]["temp_table"]}"""
+        FMCSQL.pyodbc_conn, f"""DROP TABLE {cfg["ny_salary"]["temp_table"]}"""
     )
 
 
