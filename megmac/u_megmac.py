@@ -66,6 +66,12 @@ def read_toml(path):
     return cfg
 
 
+def return_query(conn_string, query):
+    df = pl.read_database_uri(query, conn_string)
+    print(df)
+    return df
+
+
 def writecsv_from_frame(frame, filename):
     print(f"writing data to {filename}")
     frame.write_csv(
@@ -85,6 +91,8 @@ def main():
             cfg['megmac']['form_id']
             )
     writecsv_from_frame(mmentries, "cog_mmentries.csv")
+    cmm_table = return_query(fmcusagl.polars_conn, "SELECT * FROM conferenceMegMac")
+    writecsv_from_frame(cmm_table, "cmm_bk.csv")
     mmentries = mmentries.rename(cfg['megmac']['schema'])
     mmentries = mmentries.select(
             pl.col('date').str.to_datetime('%Y-%m-%d'),
