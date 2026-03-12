@@ -1,5 +1,37 @@
-from fmctools import fmccfg, fmccog, fmccsv, fmcmsx, fmcpol, fmcsql
+import json
 import polars as pl
+import pyodbc
+import requests
+import tomllib
+
+
+class SQLServer:
+    def __init__(self, cfg_dict):
+        self.usr = cfg_dict["usr"]
+        self.pw = cfg_dict["pw"]
+        self.server = cfg_dict["server"]
+        self.db = cfg_dict["db"]
+        self.port = cfg_dict["port"]
+        self.read_flags = cfg_dict["read_flags"]
+        self.read_flags_2 = cfg_dict["read_flags_2"]
+        self.driver = cfg_dict["driver"]
+        self.polars_conn = (
+            f"mssql://{self.usr}:{self.pw}@"
+            f"{self.server}:{self.port}/"
+            f"{self.db}?{self.read_flags}"
+        )
+        self.polars_conn_2 = (
+            f"mssql://{self.usr}:{self.pw}@"
+            f"{self.server}:{self.port}/"
+            f"{self.db}?{self.read_flags_2}"
+        )
+        self.pyodbc_conn = (
+            f"DRIVER={self.driver};"
+            f"SERVER={self.server},{self.port};"
+            f"DATABASE={self.db};"
+            f"UID={self.usr};"
+            f"PWD={self.pw};"
+        )
 
 
 def add_race_cols(df):
@@ -63,6 +95,17 @@ def add_consent_cols(df):
     return result
 
 
+def execute_sql(conn_str, script):
+    print(f"executing {script}...")
+    conn = pyodbc.connect(conn_str)
+    csr = conn.cursor()
+    csr.execute(script)
+    conn.commit()
+    csr.close()
+    conn.close()
+    print(f"{script} executed")
+
+
 def fix_dates(df):
     result = df
     result = result.with_columns(
@@ -95,19 +138,54 @@ def format_surveys(df, col_rename, col_select):
     return result
 
 
+def get_form_ret_df(api_key, form_id, view_id=1):
+    r = requests.get(
+        f"https://www.cognitoforms.com/api/odata/Forms({form_id})/Views({view_id})/Entries",
+        headers={"Authorization": f"Bearer {api_key}"},
+    )
+    print(r)
+    entries = json.loads(r.text)
+    form_entries = pl.DataFrame(entries["value"])
+    print(form_entries)
+    return form_entries
+
+
+def read_toml(path):
+    try:
+        with open(path, "rb") as f:
+            cfg = tomllib.load(f)
+            print(cfg["readme"])
+    except Exception as e:
+        print("reading toml failed")
+        print(repr(e))
+        cfg = {}
+    return cfg
+
+
+def writecsv_from_frame(frame, filename):
+    print(f"writing data to {filename}")
+    frame.write_csv(
+        file=filename,
+        separator=",",
+        quote_char='"',
+        float_scientific=False,
+    )
+    print(f"{filename} written")
+
+
 def main():
-    cfg = fmccfg.read_toml("minister_surveys_cfg.toml")
-    FMCSQL = fmcsql.SQLServer(cfg["sql"])
+    cfg = read_toml("minister_surveys_cfg.toml")
+    FMCSQL = SQLServer(cfg["sql"])
     api_key = cfg["cognito"]["api_key"]
     form_id = cfg["cogministersurveys"]["form_id"]
-    surveys = fmccog.get_form_ret_df(api_key, form_id)
+    surveys = get_form_ret_df(api_key, form_id)
     surveys = format_surveys(
         surveys,
         cfg["cogministersurveys"]["col_rename"],
         cfg["cogministersurveys"]["col_select"],
     )
     print(surveys)
-    fmccsv.writecsv_from_frame(surveys, "cog_minister_surveys.csv")
+    writecsv_from_frame(surveys, "cog_minister_surveys.csv")
     print("local csv written...")
     surveys.write_database(
         table_name="s_cog_minister_surveys",
@@ -116,9 +194,9 @@ def main():
         if_table_exists="replace",
     )
     print("s_cog_minister_surveys updated...")
-    fmcsql.execute_sql(FMCSQL.pyodbc_conn, "exec u_ministers_surveys")
-    fmcsql.execute_sql(FMCSQL.pyodbc_conn, "DROP TABLE s_cog_minister_surveys")
-    fmcmsx.refresh_excel(cfg["msx_reports"]["mailing_list_path"])
+    execute_sql(FMCSQL.pyodbc_conn, "exec u_ministers_surveys")
+    execute_sql(FMCSQL.pyodbc_conn, "DROP TABLE s_cog_minister_surveys")
+    # fmcmsx.refresh_excel(cfg["msx_reports"]["mailing_list_path"])
 
 
 if __name__ == "__main__":
