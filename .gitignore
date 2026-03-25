@@ -13,3 +13,7 @@ venv.bak/
 
 # cfg toml
 *cfg.toml
+
+# bash scripts
+u*.sh
+u*.log
