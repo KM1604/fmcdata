@@ -66,7 +66,7 @@ def read_toml(path):
 
 
 def return_query(conn_string, query):
-    df = polars.read_database_uri(query, conn_string)
+    df = pl.read_database_uri(query, conn_string)
     print(df)
     return df
 
