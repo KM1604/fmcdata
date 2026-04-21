@@ -26,6 +26,17 @@ def km0029():
             for col in big_atts.columns
         ).alias("Constituent Attribute Description")
     )
+    atts = atts.with_columns(
+        pl.coalesce(
+            pl.when(
+                "Constituent Specific Attributes "
+                + pl.col("Constituent Attribute Category")
+                + " Date"
+                == col
+            ).then(col)
+            for col in big_atts.columns
+        ).alias("Constituent Attribute Date")
+    )
     atts = atts.select(
         [
             "System Record ID",
@@ -33,12 +44,13 @@ def km0029():
             "Constituent Attribute Date",
             "Constituent Attribute Category",
             "Constituent Attribute Description",
-            "Constituent Attribute Comments",
         ]
     )
+    atts = blank_to_nulls(atts)
     atts = atts.unique(maintain_order=True)
     print(atts)
     writecsv_from_frame(atts, "small_atts.csv")
+
     atts.write_database(
         connection=fmcusa_gl.polars_conn_2,
         table_name=cfg["km0029"]["s_table"],
@@ -47,6 +59,7 @@ def km0029():
     )
     execute_sql(fmcusa_gl.pyodbc_conn, cfg["km0029"]["u_script"])
     execute_sql(fmcusa_gl.pyodbc_conn, f"""DROP TABLE {cfg['km0029']['s_table']}""")
+
     return atts
 
 
