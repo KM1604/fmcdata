@@ -88,8 +88,8 @@ def re_table_update(cfg_value, sql):
         engine="sqlalchemy",
         if_table_exists="replace",
     )
-    # execute_sql(sql.pyodbc_conn, cfg_value["u_script"])
-    # execute_sql(sql.pyodbc_conn, f'''DROP TABLE {cfg_value["s_table"]}''')
+    execute_sql(sql.pyodbc_conn, cfg_value["u_script"])
+    execute_sql(sql.pyodbc_conn, f"""DROP TABLE {cfg_value["s_table"]}""")
 
 
 def main():
@@ -111,7 +111,7 @@ def main():
     # km0029 because attributes are stupid
     km0029()
 
-    # fmcsql.execute_sql(FMCSQL.pyodbc_conn, f'''EXEC u_all''')
+    execute_sql(FMCSQL.pyodbc_conn, f"""EXEC u_all""")
 
 
 if __name__ == "__main__":
