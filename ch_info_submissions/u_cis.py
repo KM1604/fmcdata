@@ -38,7 +38,7 @@ class SQLServer:
 def execute_sql(conn_str, script):
     print(f"executing {script}...")
     conn = pyodbc.connect(conn_str)
-    csr = connection.cursor()
+    csr = conn.cursor()
     csr.execute(script)
     conn.commit()
     csr.close()
