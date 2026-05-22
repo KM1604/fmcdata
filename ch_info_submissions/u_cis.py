@@ -95,7 +95,7 @@ def main():
 
     # backup existing table to local SQLite db
     pre_cis = return_query(
-        fmcusa_gl.polars_conn, f"SELECT * FROM {cfg['cis']['s_table']}"
+        fmcusa_gl.polars_conn, f"SELECT * FROM {cfg['cis']['bk_table']}"
     )
     pre_cis.write_database(
         table_name="pre_cis", connection="sqlite:///cis.db", if_table_exists="replace"
