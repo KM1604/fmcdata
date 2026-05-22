@@ -113,6 +113,9 @@ def main():
         if_table_exists="replace",
     )
 
+    execute_sql(fmcusa_gl.pyodbc_conn, 'EXEC u_ch_info_forms')
+    execute_sql(fmcusa_gl.pyodbc_conn, 'DROP TABLE s_ch_info_forms')
+    
 
 if __name__ == "__main__":
     main()
