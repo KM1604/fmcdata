@@ -53,7 +53,7 @@ def get_form_ret_df(api_key, form_id, view_id=1):
     )
     print(r)
     entries = json.loads(r.text)
-    form_entries = pl.DataFrame(entries["value"])
+    form_entries = pl.DataFrame(entries["value"], infer_schema_length=500)
     print(form_entries)
     return form_entries
 
