@@ -109,7 +109,7 @@ def main():
         if_table_exists='replace'
     )
     execute_sql(fmcusagl.pyodbc_conn, "EXECUTE u_churchMonthlyReport")
-    # execute_sql(fmcusagl.pyodbc_conn, "DROP TABLE s_churchMonthlyReport")
+    execute_sql(fmcusagl.pyodbc_conn, "DROP TABLE s_churchMonthlyReport")
 
 if __name__ == "__main__":
     main()
