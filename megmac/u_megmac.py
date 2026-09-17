@@ -4,6 +4,7 @@ import polars as pl
 import requests
 import tomllib
 
+
 class SQLServer:
     def __init__(self, cfg_dict):
         self.usr = cfg_dict["usr"]
@@ -15,22 +16,22 @@ class SQLServer:
         self.read_flags_2 = cfg_dict["read_flags_2"]
         self.driver = cfg_dict["driver"]
         self.polars_conn = (
-                f"mssql://{self.usr}:{self.pw}@"
-                f"{self.server}:{self.port}/"
-                f"{self.db}?{self.read_flags}"
-                )
+            f"mssql://{self.usr}:{self.pw}@"
+            f"{self.server}:{self.port}/"
+            f"{self.db}?{self.read_flags}"
+        )
         self.polars_conn_2 = (
-                f"mssql://{self.usr}:{self.pw}@"
-                f"{self.server}:{self.port}/"
-                f"{self.db}?{self.read_flags_2}"
-                )
+            f"mssql://{self.usr}:{self.pw}@"
+            f"{self.server}:{self.port}/"
+            f"{self.db}?{self.read_flags_2}"
+        )
         self.pyodbc_conn = (
-                f"DRIVER={self.driver};"
-                f"SERVER={self.server},{self.port};"
-                f"DATABASE={self.db};"
-                f"UID={self.usr};"
-                f"PWD={self.pw};"
-                )
+            f"DRIVER={self.driver};"
+            f"SERVER={self.server},{self.port};"
+            f"DATABASE={self.db};"
+            f"UID={self.usr};"
+            f"PWD={self.pw};"
+        )
 
 
 def execute_sql(conn_str, script):
@@ -75,54 +76,45 @@ def return_query(conn_string, query):
 def writecsv_from_frame(frame, filename):
     print(f"writing data to {filename}")
     frame.write_csv(
-            file=filename,
-            separator=",",
-            quote_char='"',
-            float_scientific=False,
-            )
+        file=filename,
+        separator=",",
+        quote_char='"',
+        float_scientific=False,
+    )
     print(f"{filename} written")
 
 
 def main():
     cfg = read_toml("megmac_cfg.toml")
-    fmcusagl = SQLServer(cfg['sql'])
-    mmentries = get_form_ret_df(
-            cfg['cognito']['api_key'], 
-            cfg['megmac']['form_id']
-            )
+    fmcusagl = SQLServer(cfg["sql"])
+    mmentries = get_form_ret_df(cfg["cognito"]["api_key"], cfg["megmac"]["form_id"])
     writecsv_from_frame(mmentries, "cog_mmentries.csv")
     cmm_table = return_query(fmcusagl.polars_conn, "SELECT * FROM conferenceMegMac")
     writecsv_from_frame(cmm_table, "cmm_bk.csv")
-    mmentries = mmentries.rename(cfg['megmac']['schema'])
+    mmentries = mmentries.rename(cfg["megmac"]["schema"])
     mmentries = mmentries.select(
-            pl.col('date').str.to_datetime('%Y-%m-%d'),
-            pl.col('conference_name'),
-            pl.col('minister_name'),
-            pl.col('minister_id'),
-            pl.col('ordination_status'),
-            pl.col('action_taken'),
-            pl.col('role_title'),
-            pl.col('organization_name'),
-            pl.col('church_id'),
-            pl.col('lead_pastor_yn'),
-            pl.col('comments'),
-            pl.col('src_id')
-            )
+        pl.col("date").str.to_datetime("%Y-%m-%d"),
+        pl.col("conference_name"),
+        pl.col("minister_name"),
+        pl.col("minister_id"),
+        pl.col("ordination_status"),
+        pl.col("action_taken"),
+        pl.col("role_title"),
+        pl.col("organization_name"),
+        pl.col("church_id"),
+        pl.col("lead_pastor_yn"),
+        pl.col("comments"),
+        pl.col("src_id"),
+    )
     print(mmentries)
     mmentries.write_database(
-            cfg['megmac']['temp_table'],
-            fmcusagl.polars_conn_2,
-            engine='sqlalchemy',
-            if_table_exists='replace'
-            )
-    execute_sql(
-            fmcusagl.pyodbc_conn,
-            'EXECUTE u_cog_megmac'
-            )
-    execute_sql(
-            fmcusagl.pyodbc_conn,
-            'DROP TABLE s_cog_megmac'
-            )
+        cfg["megmac"]["temp_table"],
+        fmcusagl.polars_conn_2,
+        engine="sqlalchemy",
+        if_table_exists="replace",
+    )
+    execute_sql(fmcusagl.pyodbc_conn, "EXECUTE u_cog_megmac")
+    execute_sql(fmcusagl.pyodbc_conn, "DROP TABLE s_cog_megmac")
 
 
 if __name__ == "__main__":

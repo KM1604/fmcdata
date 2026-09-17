@@ -3,7 +3,6 @@ import requests
 import tomllib
 
 
-
 def post_csv_to_form(
     cognito_api, src_filename, form_id, import_mode, email, match_on=None
 ):
@@ -22,6 +21,7 @@ def post_csv_to_form(
         files={"files": (src_filename, src, "text/csv")},
     )
     return r
+
 
 def read_toml(path):
     try:
@@ -44,11 +44,11 @@ def return_query(conn_string, query):
 def writecsv_from_frame(frame, filename):
     print(f"writing data to {filename}")
     frame.write_csv(
-            file=filename,
-            separator=",",
-            quote_char='"',
-            float_scientific=False,
-            )
+        file=filename,
+        separator=",",
+        quote_char='"',
+        float_scientific=False,
+    )
     print(f"{filename} written")
 
 
@@ -63,22 +63,22 @@ class SQLServer:
         self.read_flags_2 = cfg_dict["read_flags_2"]
         self.driver = cfg_dict["driver"]
         self.polars_conn = (
-                f"mssql://{self.usr}:{self.pw}@"
-                f"{self.server}:{self.port}/"
-                f"{self.db}?{self.read_flags}"
-                )
+            f"mssql://{self.usr}:{self.pw}@"
+            f"{self.server}:{self.port}/"
+            f"{self.db}?{self.read_flags}"
+        )
         self.polars_conn_2 = (
-                f"mssql://{self.usr}:{self.pw}@"
-                f"{self.server}:{self.port}/"
-                f"{self.db}?{self.read_flags_2}"
-                )
+            f"mssql://{self.usr}:{self.pw}@"
+            f"{self.server}:{self.port}/"
+            f"{self.db}?{self.read_flags_2}"
+        )
         self.pyodbc_conn = (
-                f"DRIVER={self.driver};"
-                f"SERVER={self.server},{self.port};"
-                f"DATABASE={self.db};"
-                f"UID={self.usr};"
-                f"PWD={self.pw};"
-                )
+            f"DRIVER={self.driver};"
+            f"SERVER={self.server},{self.port};"
+            f"DATABASE={self.db};"
+            f"UID={self.usr};"
+            f"PWD={self.pw};"
+        )
 
 
 cfg = read_toml("cognito_cfg.toml")

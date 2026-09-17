@@ -88,7 +88,7 @@ def main():
         if_table_exists="replace",
     )
     fips = csv_to_df(cfg.get("postal_and_county").get("src_filename"))
-    fips = fips.with_columns(pl.lit(0).alias('pop_rank'))
+    fips = fips.with_columns(pl.lit(0).alias("pop_rank"))
     fips.write_database(
         table_name="csv_src",
         connection="sqlite:///postal_and_county.db",
@@ -100,7 +100,7 @@ def main():
         engine="sqlalchemy",
         if_table_exists="replace",
     )
-    execute_sql(fmcusagl.pyodbc_conn, 'exec u_postal_and_county')
+    execute_sql(fmcusagl.pyodbc_conn, "exec u_postal_and_county")
 
 
 if __name__ == "__main__":

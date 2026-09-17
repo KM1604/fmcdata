@@ -91,25 +91,30 @@ def main():
 
     cfg = read_toml("cmr_cfg.toml")
     fmcusagl = SQLServer(cfg["sql"])
-    entries = get_form_ret_df(cfg.get('cognito').get('api_key'), cfg.get('cmr').get('form_id'))
+    entries = get_form_ret_df(
+        cfg.get("cognito").get("api_key"), cfg.get("cmr").get("form_id")
+    )
     # possible schema fixing???
     entries.write_database(
-        table_name="cmr_entries", connection="sqlite:///cmr.db", if_table_exists="replace"
+        table_name="cmr_entries",
+        connection="sqlite:///cmr.db",
+        if_table_exists="replace",
     )
     entries.write_database(
-        table_name=cfg.get('cmr').get('s_table'),
+        table_name=cfg.get("cmr").get("s_table"),
         connection=fmcusagl.polars_conn_2,
-        engine='sqlalchemy',
-        if_table_exists='replace'
+        engine="sqlalchemy",
+        if_table_exists="replace",
     )
-    cmr = return_query(fmcusagl.polars_conn, f'SELECT * FROM churchMonthlyReport')
+    cmr = return_query(fmcusagl.polars_conn, f"SELECT * FROM churchMonthlyReport")
     cmr.write_database(
-        table_name='churchMonthlyReport',
-        connection='sqlite:///cmr.db',
-        if_table_exists='replace'
+        table_name="churchMonthlyReport",
+        connection="sqlite:///cmr.db",
+        if_table_exists="replace",
     )
     execute_sql(fmcusagl.pyodbc_conn, "EXECUTE u_churchMonthlyReport")
     execute_sql(fmcusagl.pyodbc_conn, "DROP TABLE s_churchMonthlyReport")
+
 
 if __name__ == "__main__":
     main()

@@ -82,7 +82,6 @@ def writecsv_from_frame(frame, filename):
     print(f"{filename} written")
 
 
-
 cfg = read_toml("cognito_cfg.toml")
 megmac = cfg["megmacactions"]
 
