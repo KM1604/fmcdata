@@ -32,6 +32,7 @@ def main():
         if_table_exists='replace',
         engine='sqlalchemy'
     )
+    # save re_notes to local sqlite db
     # run stored procedure to merge s_re_notes to re_notes
     # DROP TABLE of s_re_notes
 
