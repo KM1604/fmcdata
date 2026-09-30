@@ -45,9 +45,9 @@ class SQLDB:
 
     def pyodbc_conn(self):
         conn_str = (
-            f"DRIVER={self.driver()}"
-            f"SERVER={self.server()},{self.port()}"
-            f"DATABASE={self.db()}"
+            f"DRIVER={self.driver()};"
+            f"SERVER={self.server()},{self.port()};"
+            f"DATABASE={self.db()};"
             f"UID={self.usr()};"
             f"PWD={self.pw()}"
         )

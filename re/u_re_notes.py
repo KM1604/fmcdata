@@ -1,9 +1,33 @@
 import polars as pl
+import pyodbc
 import tomllib
 
 from fmccfg import read_toml
 from fmccsv import csv_to_df
+from fmcsql import return_query
 from SQLDB import SQLDB
+
+def execute_sql(conn_str: str, script: str):
+    '''
+    execute command on sql server with provided connection string
+
+    Keyword Arguments:
+    conn_str -- connection string for server
+    script -- command to be run (avoid disallowed characters)
+    '''
+    if ";" in script or "(" in script or ")" in script:
+        print("disallowed character in stored procedure name")
+        return False
+    print(f"sending to server:\n{script}...", end="")
+    conn = pyodbc.connect(conn_str)
+    conn.close()
+    with pyodbc.connect(conn_str) as conn:
+        cursor = conn.cursor()
+        cursor.execute(script)
+        cursor.close()
+        conn.commit()
+    print(f"complete")
+
 
 def main():
     FMCUSAGL = SQLDB("fmcusa_gl_cfg.toml")
@@ -32,9 +56,26 @@ def main():
         if_table_exists='replace',
         engine='sqlalchemy'
     )
-    # save re_notes to local sqlite db
-    # run stored procedure to merge s_re_notes to re_notes
-    # DROP TABLE of s_re_notes
+    t_re_notes = return_query(
+        FMCUSAGL.polars_conn(encrypt='true', trust='false'),
+        'SELECT * FROM re_notes'
+    )
+    t_re_notes.write_database(
+        connection='sqlite:///re_notes.db',
+        table_name='t_re_notes',
+        if_table_exists='replace',
+        engine='sqlalchemy'
+    )
+    print(FMCUSAGL.pyodbc_conn())
+    execute_sql(
+        FMCUSAGL.pyodbc_conn(),
+        'exec u_re_notes'
+    )
+    execute_sql(
+        FMCUSAGL.pyodbc_conn(),
+        'DROP TABLE s_re_notes'
+    )
+
 
 if __name__ == '__main__':
     main()
