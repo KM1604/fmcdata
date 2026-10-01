@@ -94,16 +94,39 @@ def add_consent_cols(df):
     )
     return result
 
+def add_ministry_cols(df):
+    result = df
+    result = result.with_columns(
+        min_youngadult=pl.when(pl.col('MinistryArea').str.contains('Young'))
+        .then(1)
+        .otherwise(0),
+        min_teen=pl.when(pl.col('MinistryArea').str.contains('Teens'))
+        .then(1)
+        .otherwise(0),
+        min_children=pl.when(pl.col('MinistryArea').str.contains('Children'))
+        .then(1)
+        .otherwise(0),
+        min_worship=pl.when(pl.col('MinistryArea').str.contains('Worship'))
+        .then(1)
+        .otherwise(0),
+        min_chaplain=pl.when(pl.col('MinistryArea').str.contains('Chaplain'))
+        .then(1)
+        .otherwise(0),
+        min_retired=pl.when(pl.col('MinistryArea').str.contains('Retired'))
+        .then(1)
+        .otherwise(0)
+    )
+    return result
 
 def execute_sql(conn_str, script):
-    print(f"executing {script}...")
+    print(f"executing {script}...", end='')
     conn = pyodbc.connect(conn_str)
     csr = conn.cursor()
     csr.execute(script)
     conn.commit()
     csr.close()
     conn.close()
-    print(f"{script} executed")
+    print('executed')
 
 
 def fix_dates(df):
@@ -131,6 +154,7 @@ def format_surveys(df, col_rename, col_select):
     result = add_eth_cols(result)
     result = add_gender_col(result)
     result = add_consent_cols(result)
+    result = add_ministry_cols(result)
     result = fix_dates(result)
     result = format_conference(result)
     result = result.rename(col_rename)
@@ -181,8 +205,8 @@ def main():
     surveys = get_form_ret_df(api_key, form_id)
     surveys = format_surveys(
         surveys,
-        cfg["cogministersurveys"]["col_rename"],
-        cfg["cogministersurveys"]["col_select"],
+        cfg.get('cogministersurveys').get('col_rename'),
+        cfg.get('cogministersurveys').get('col_select')
     )
     print(surveys)
     writecsv_from_frame(surveys, "cog_minister_surveys.csv")
