@@ -5,6 +5,7 @@ import requests
 
 from email.utils import formatdate
 
+
 def get_views(usr: str, pw: str):
     """given api usr and pw, returns json response"""
     r = requests.get("https://fmcusa.sitestacker.net/api/reports/views", auth=(usr, pw))
@@ -33,7 +34,7 @@ def ss_auth_headers(api_id: str, api_secret: str, method: str = "GET", content_t
 
 
 def sist_auth(usr: str, key: str, method: str = "GET", content_type: str = "") -> dict:
-    '''
+    """
     Generates Site Stacker HMAC headers. Time sensitive within 300s of generation.
 
     Keyword Arguments:
@@ -41,14 +42,17 @@ def sist_auth(usr: str, key: str, method: str = "GET", content_type: str = "") -
     key -- API secret
     method -- defaults to GET, use uppercase
     content_type -- defaults to empty string - stolen from sist rep
-    '''
-    date = formatdate(usegmt=True) #not ISO "Fri, 09 Oct 2026 17:19:44 GMT"
-    string_to_sign = f'{method}\n{content_type}\n{date}'
-    signature = hmac.new(key.encode(), string_to_sign.encode(), hashlib.sha256).hexdigest()
+    """
+    date = formatdate(usegmt=True)  # not ISO "Fri, 09 Oct 2026 17:19:44 GMT"
+    string_to_sign = f"{method}\n{content_type}\n{date}"
+    signature = hmac.new(
+        key.encode(), string_to_sign.encode(), hashlib.sha256
+    ).hexdigest()
     headers = {"ss-date": date, "Authorization": f"HMAC {usr}:{signature}"}
     if content_type:
-        headers['Content-Type'] = content_type
+        headers["Content-Type"] = content_type
     return headers
+
 
 def main():
     print("success")
