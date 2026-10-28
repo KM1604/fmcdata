@@ -17,3 +17,6 @@ venv.bak/
 # bash scripts
 u*.sh
 u*.log
+
+# pycache
+*__pycache__*
