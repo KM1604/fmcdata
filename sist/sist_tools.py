@@ -6,15 +6,21 @@ import requests
 from email.utils import formatdate
 
 
-def get_views(usr: str, pw: str):
-    """given api usr and pw, returns json response"""
-    r = requests.get("https://fmcusa.sitestacker.net/api/reports/views", auth=(usr, pw))
+def get_views(hmac_auth: str) -> dict:
+    """given hashed headers, returns json response
+
+    Keyword-arguments:
+    hmac_auth -- output from sist_auth that provides a hashed string to authenticate
+    """
+    r = requests.get(
+        "https://fmcusa.sitestacker.net/api/reports/views",
+        headers=hmac_auth,
+        timeout=30,
+    )
     print(r.status_code)
     print(r.encoding)
     print(r.text)
-    views = r.json
-    print(views)
-    return views
+    return r.json
 
 
 '''
