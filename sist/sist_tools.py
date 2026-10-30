@@ -6,7 +6,7 @@ import requests
 from email.utils import formatdate
 
 
-def get_views(hmac_auth: str) -> dict:
+def get_views(hmac_auth: str) -> str:
     """given hashed headers, returns json response
 
     Keyword-arguments:
@@ -19,8 +19,7 @@ def get_views(hmac_auth: str) -> dict:
     )
     print(r.status_code)
     print(r.encoding)
-    print(r.text)
-    return r.json
+    return r.text
 
 
 '''
