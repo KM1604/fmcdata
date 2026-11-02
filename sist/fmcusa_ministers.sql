@@ -22,7 +22,18 @@ id_and_key AS(
             AND conferenceMegMac.minister_id = min_ids.minister_id 
             AND (1=2
                 OR action_taken IN (SELECT action_taken FROM cog_megmac_actions WHERE action_type = 'MAC')
-                OR action_taken = 'Deceased'
+                OR action_taken IN(
+                    'Deceased',
+                    'Suspended',
+                    'Credentials Declared Null and Void',
+                    'Credentials Placed on Deposit with the Conference Office',
+                    'Discontinued as Licensed Pastor',
+                    'Discontinued as Conference Ministerial Candidate',
+                    'Withdrawn from Conference and Denomination at Own Request',
+                    'Withdrawn from Conference and Denomination with Permission Under Charges or Complaints',
+                    'Withdrawn from Conference and Denomination',
+                    'Returned to Lay Status'
+                )
             )
         ORDER BY [date] DESC
         ) AS appointment_id
